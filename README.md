@@ -2,7 +2,7 @@
 
 Generate 3D solids from 2D polygon GIS features.
 
-Use this lightweight Python tool to convert 2D polygons into 3D objects using specified top and bottom elevations. 
+You can use this lightweight Python tool to convert 2D polygons into 3D objects using specified top and bottom elevations.
 
 Designed to work with shapefiles and geopackages.
 
@@ -23,7 +23,7 @@ by extruding 2D polygons into vertical surfaces that represent structural or hyd
 
 > Future Update: Support for variable vertex-wise extrusion based on elevation data from DEMs or point clouds.
 
-## 🧰 Requirements
+## Requirements
 
 - Python 3.9+
 - [GeoPandas](https://geopandas.org/)
