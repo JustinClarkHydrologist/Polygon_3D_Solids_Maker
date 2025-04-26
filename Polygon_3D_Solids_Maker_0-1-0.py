@@ -18,6 +18,9 @@ import trimesh                            # For creating and exporting 3D mesh g
 import os                                 # For file and directory operations
 from pathlib import Path                  # For more readable and safer file path management
 
+##Find kernel's current directory, update to desired location if necessary
+path = r'C:\MyPy\programs\Polygon_3D_Solids_Maker\Test01_Square_Phoenix.shp'  ##This is the test file I have provided for simple a 2D polygon shapefile
+
 # Function to extrude a 2D polygon vertically into a 3D object
 def extrude_polygon_to_3d(polygon: Polygon, z_min: float, z_max: float) -> trimesh.Trimesh:
     """
