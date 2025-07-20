@@ -19,8 +19,34 @@ import trimesh                            # For creating and exporting 3D mesh g
 import os                                 # For file and directory operations
 from pathlib import Path                  # For more readable and safer file path management
 
-##Find kernel's current directory, update to desired location if necessary
-path = r'C:\MyPy\programs\Polygon_3D_Solids_Maker\Test01_Square_Phoenix.shp'  ##This is the test file I have provided for simple a 2D polygon shapefile
+## Find kernel's current directory, update to desired location if necessary
+## Windows and Linux path are formatted differently
+path = r'/home/jac/Mdl/TX/GulfCoast_North/ModelGrid/GULF_modelGrid_QGIS.gdb
+#path = r'C:\MyPy\programs\Polygon_3D_Solids_Maker\Test01_Square_Phoenix.shp'  ##This is the test file I have provided for simple a 2D polygon shapefile
+## TODO Implement Args parser or tkinter to get file path and name
+
+# Function to preprocess grid data
+def preprocess_geodata
+    # Read input polygon layer using GeoPandas (supports both .shp and .gpkg)
+    gdf = gpd.read_file(input_file)
+
+
+    #Get the names of the columns in the input data
+    col_names = list(gdf.columns)
+    #print(col_names)
+    #Example Output: 
+[OBJECTID	row	col	natlRow	natlCol	top_1	bot_1	bot_2	bot_3	bot_4	bot_5	bot_6	IB_1	IB_2	IB_3	IB_4	IB_5	IB_6
+  ZB_1	ZB_2	ZB_3	ZB_4	ZB_5	ZB_6	GHB	DRN_unname	DRN_named	DRN_Head	RIV_named	NHD_length	RIV_stage	RIV_bot
+  fine_m2	fine_m3	fine_m4	fine_m5	rnb2	rnb3	rnb4	rnb5	IC_1	GCD	GMAnum	CNTY_NM	RWPA	X	Y	IB_active	Shape_Length	Shape_Area]
+ 
+    #Extract the top and bottom column by parsing the columns of the input dataset
+    for x in col_names.count():
+        col_names.loc(x)[-1].isdigit()
+    LyrTop = col_names.loc(-1)[-1:].as_string()
+    LyrBot = col_names.loc(0)[-1:].as_string()
+    Layers = 1 + LyrBot - LyrTop
+      
+    
 
 # Function to extrude a 2D polygon vertically into a 3D object
 def extrude_polygon_to_3d(polygon: Polygon, z_min: float, z_max: float) -> trimesh.Trimesh:
