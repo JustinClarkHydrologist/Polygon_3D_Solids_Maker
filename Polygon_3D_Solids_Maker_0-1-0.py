@@ -5,8 +5,9 @@
 @author: Justin A. Clark
 
 This program takes a data from a GIS polygon feature and converts that feature into a 3D object
-   -
-   -
+   - Can read shapefile and geopackages
+   - Load MODFLOW Model Grids
+   - GIS output formats will be selected by User
    
 Test Run Time = X min XX Seconds
 
