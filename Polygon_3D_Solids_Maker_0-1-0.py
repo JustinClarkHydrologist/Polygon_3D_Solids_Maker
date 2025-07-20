@@ -21,7 +21,7 @@ from pathlib import Path                  # For more readable and safer file pat
 
 ## Find kernel's current directory, update to desired location if necessary
 ## Windows and Linux path are formatted differently
-path = r'/home/jac/Mdl/TX/GulfCoast_North/ModelGrid/GULF_modelGrid_QGIS.gdb
+path = r'/home/jac/Mdl/TX/GulfCoast_North/ModelGrid/GULF_modelGrid_QGIS.gdb'
 #path = r'C:\MyPy\programs\Polygon_3D_Solids_Maker\Test01_Square_Phoenix.shp'  ##This is the test file I have provided for simple a 2D polygon shapefile
 ## TODO Implement Args parser or tkinter to get file path and name
 
@@ -47,10 +47,11 @@ def preprocess_geodata(input_file):
     col_names = list(gdf.columns)
 
     #Example col_names: 
-#[OBJECTID	row	col	natlRow	natlCol	top_1	bot_1	bot_2	bot_3	bot_4	bot_5	bot_6	IB_1	IB_2	IB_3	IB_4	IB_5	IB_6
-#  ZB_1	ZB_2	ZB_3	ZB_4	ZB_5	ZB_6	GHB	DRN_unname	DRN_named	DRN_Head	RIV_named	NHD_length	RIV_stage	RIV_bot
-#  fine_m2	fine_m3	fine_m4	fine_m5	rnb2	rnb3	rnb4	rnb5	IC_1	GCD	GMAnum	CNTY_NM	RWPA	X	Y	IB_active	Shape_Length	Shape_Area]
-
+"""
+[OBJECTID	row	col	natlRow	natlCol	top_1	bot_1	bot_2	bot_3	bot_4	bot_5	bot_6	IB_1	IB_2	IB_3	IB_4	IB_5	IB_6
+  ZB_1	ZB_2	ZB_3	ZB_4	ZB_5	ZB_6	GHB	DRN_unname	DRN_named	DRN_Head	RIV_named	NHD_length	RIV_stage	RIV_bot
+  fine_m2	fine_m3	fine_m4	fine_m5	rnb2	rnb3	rnb4	rnb5	IC_1	GCD	GMAnum	CNTY_NM	RWPA	X	Y	IB_active	Shape_Length	Shape_Area]
+"""
     # Acceptable field name patterns for top of layer 1
     top_candidates = [c for c in col_names if c.lower() in ["top_1", "top1"]]
 
