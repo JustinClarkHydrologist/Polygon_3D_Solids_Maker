@@ -125,21 +125,46 @@ def extrude_polygon_to_3d(polygon: Polygon, z_min: float, z_max: float) -> trime
     return mesh  # Return the 3D mesh
 
 # Function to process all polygons in the input file
-def process_geodata(input_file: str, top_z: float, bottom_z: float, output_dir: str):
+def process_geodata(gdf, top_field: str, bot_field: str, output_dir: str):
     """
-    Loads 2D polygon data, extrudes each polygon into 3D, and saves the results as STL files.
-
+    Extrude each polygon from its layer-1 top to deepest bottom and
+    write an STL mesh.  All elevations come from attribute fields.
+    
     Parameters:
         input_file (str): Path to the shapefile or geopackage (.shp or .gpkg)
         top_z (float): Top elevation of extrusion
         bottom_z (float): Bottom elevation of extrusion
         output_dir (str): Directory to save the exported 3D models
     """
-    # Read input polygon layer using GeoPandas (supports both .shp and .gpkg)
-    gdf = gpd.read_file(input_file)
-
-    # Make sure the output directory exists (create it if not)
     os.makedirs(output_dir, exist_ok=True)
+
+    for idx, row in gdf.iterrows():
+        geom = row.geometry
+        if isinstance(geom, Polygon):
+            z_top = row[top_field]        # e.g. value from top_1
+            z_bot = row[bot_field]        # e.g. value from bot_6
+
+            # Skip rows with missing elevation data
+            if z_top is None or z_bot is None:
+                print(f"  -- Missing z values at index {idx}; skipped.")
+                continue
+
+            # Extrude polygon into 3D mesh
+            mesh = extrude_polygon_to_3d(geom, z_min=z_bot, z_max=z_top)
+
+            # Define output path for this mesh using index
+            out_path = Path(output_dir) / f"layer1_full_{idx}.stl"
+
+            # Export the mesh as an STL file
+            mesh.export(str(out_path))
+
+            # Print confirmation message
+            print(f"Exported: {out_path}")
+
+        else:
+            # Skip non-polygon features (e.g., points, lines), print message indicating occurrence
+            print(f"  -- Non-polygon geometry at index {idx}; skipped.")
+
 
     # Loop through each row (feature) in the GeoDataFrame
     for idx, row in gdf.iterrows():
@@ -165,19 +190,15 @@ def process_geodata(input_file: str, top_z: float, bottom_z: float, output_dir: 
 
 # Main execution block for running this script directly
 if __name__ == "__main__":
-    # Define example input file (can be shapefile or geopackage)
-    input_filepath = "example_inputs/polygon_sample.shp"  # Change to your input file
+    input_file = path                              # use your path variable
+    gdf, top_field, bot_field, Layers = preprocess_geodata(input_file)
 
     # Define the output folder to save 3D models
-    output_folder = "outputs"
-
-    # Set the vertical elevation range for extrusion (in meters or map units)
-    top_elevation = 100.0      # Top of the wall
-    bottom_elevation = 80.0    # Base of the wall
+    output_folder = "outputs_layer1_full"          # change if you like
+    print(f"\n>>> Extruding polygons from {top_field} down to {bot_field}")
 
     # Run the full processing function with specified inputs
-    process_geodata(input_filepath, top_elevation, bottom_elevation, output_folder)
-
+    process_geodata(gdf, top_field, bot_field, output_folder)
 
 ##############################################################################
 #  ### ### ### ### ### #### ### ### ### ### ### #### ### ### ### ### ### ###  #
