@@ -26,28 +26,74 @@ path = r'/home/jac/Mdl/TX/GulfCoast_North/ModelGrid/GULF_modelGrid_QGIS.gdb
 ## TODO Implement Args parser or tkinter to get file path and name
 
 # Function to preprocess grid data
-def preprocess_geodata
-    # Read input polygon layer using GeoPandas (supports both .shp and .gpkg)
-    gdf = gpd.read_file(input_file)
+def preprocess_geodata(input_file):
+    """
+    Load the input polygon data and determine the number of layers
+    by parsing the column names. Supports both shapefiles and geopackages.
 
+    Returns:
+        gdf (GeoDataFrame): loaded GeoDataFrame
+        top_field (str): name of the top elevation field for layer 1
+        bot_field (str): name of the bottom elevation field for the last layer
+        Layers (int): total number of model layers
+    """
+    # Detect file type and load accordingly
+    if input_file.endswith(".shp") or input_file.endswith(".gpkg") or input_file.endswith(".gdb"):
+        gdf = gpd.read_file(input_file)
+    else:
+        raise ValueError("Unsupported file format. Currenly only supports these file types: .shp, .gpkg, .gdb.")
 
-    #Get the names of the columns in the input data
+    # List of all columns
     col_names = list(gdf.columns)
-    #print(col_names)
-    #Example Output: 
-[OBJECTID	row	col	natlRow	natlCol	top_1	bot_1	bot_2	bot_3	bot_4	bot_5	bot_6	IB_1	IB_2	IB_3	IB_4	IB_5	IB_6
-  ZB_1	ZB_2	ZB_3	ZB_4	ZB_5	ZB_6	GHB	DRN_unname	DRN_named	DRN_Head	RIV_named	NHD_length	RIV_stage	RIV_bot
-  fine_m2	fine_m3	fine_m4	fine_m5	rnb2	rnb3	rnb4	rnb5	IC_1	GCD	GMAnum	CNTY_NM	RWPA	X	Y	IB_active	Shape_Length	Shape_Area]
- 
-    #Extract the top and bottom column by parsing the columns of the input dataset
-    for x in col_names.count():
-        col_names.loc(x)[-1].isdigit()
-    LyrTop = col_names.loc(-1)[-1:].as_string()
-    LyrBot = col_names.loc(0)[-1:].as_string()
-    Layers = 1 + LyrBot - LyrTop
-      
-    
 
+    #Example col_names: 
+#[OBJECTID	row	col	natlRow	natlCol	top_1	bot_1	bot_2	bot_3	bot_4	bot_5	bot_6	IB_1	IB_2	IB_3	IB_4	IB_5	IB_6
+#  ZB_1	ZB_2	ZB_3	ZB_4	ZB_5	ZB_6	GHB	DRN_unname	DRN_named	DRN_Head	RIV_named	NHD_length	RIV_stage	RIV_bot
+#  fine_m2	fine_m3	fine_m4	fine_m5	rnb2	rnb3	rnb4	rnb5	IC_1	GCD	GMAnum	CNTY_NM	RWPA	X	Y	IB_active	Shape_Length	Shape_Area]
+
+    # Acceptable field name patterns for top of layer 1
+    top_candidates = [c for c in col_names if c.lower() in ["top_1", "top1"]]
+
+    # Raise error if top not found
+    if not top_candidates:
+        raise ValueError("Field for top of layer 1 not found. Acceptable options: top_1, Top_1, top1, Top1.")
+
+    # Use the first match as the top field name
+    top_field = top_candidates[0]
+
+    # Find the bottom layer field using prefix logic (e.g., bot_1, bot2, BOT_10).
+    bot_fields = []
+    for col in col_names:
+        col_lower = col.lower()
+        if col_lower.startswith("bot") or col_lower.startswith("bot_"):
+            # Extract numeric suffix
+            suffix = ''.join(filter(str.isdigit, col))
+            if suffix.isdigit():
+                bot_fields.append((int(suffix), col))
+
+    # === Identify bottom-most layer field ===
+    # We previously created a list of tuples: (layer_number, field_name)
+    # Now, we'll iterate through it to find the tuple with the highest layer number
+
+    max_bot_layer_num = -1      # Initialize with invalid number
+    bot_field = None            # Placeholder for field name with deepest layer
+
+    for layer_num, field_name in bot_fields:
+        if layer_num > max_bot_layer_num:
+            max_bot_layer_num = layer_num
+            bot_field = field_name  # Keep the name associated with the largest number
+
+    # Final total number of layers (assuming model starts at layer 1)
+    Layers = max_bot_layer_num
+
+    # Generate error if field is not found
+    if not bot_field:
+        raise ValueError("Unable to determine deepest bottom layer field.")
+
+    print(f"Top field: {top_field}, Bottom field: {bot_field}, Total layers: {Layers}")
+
+    return gdf, top_field, bot_field, Layers
+   
 # Function to extrude a 2D polygon vertically into a 3D object
 def extrude_polygon_to_3d(polygon: Polygon, z_min: float, z_max: float) -> trimesh.Trimesh:
     """
