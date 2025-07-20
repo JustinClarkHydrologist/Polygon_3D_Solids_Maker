@@ -38,3 +38,8 @@ by extruding 2D polygons into vertical surfaces that represent structural or hyd
 ```python
 
 # Coming soon: Script-based CLI and example input/output files
+
+Example file from Texas Water Development Board - GAM Downloads:
+https://gw-models.s3.amazonaws.com/Download_GAMs/glfc_n/glfc_n_v4.01_GULF2023_modelGrid.7z
+GULF_modelGrid.gdb
+
